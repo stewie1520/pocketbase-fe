@@ -1,8 +1,8 @@
 "use client";
 
 import { Suspense } from "react";
-import { CreateProjectDrawer } from "./_project-drawer/create-project-drawer";
-import { MyProjectsList } from "./my-projects-list";
+import { CreateProjectDrawer } from "./_components/project-drawer/create-project-drawer";
+import { MyProjectsList } from "./_components/my-project-list/my-projects-list";
 import { Layers } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 

@@ -1,6 +1,6 @@
 import { CollectionEnum, usePocketBase } from "@/lib/pocketbase";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { MyProjectModel } from "../../../models/my-project";
+import { MyProjectModel } from "@/models/my-project";
 
 export const useQueryMyProjectDetail = (id: string) => {
   const pb = usePocketBase();
@@ -8,7 +8,7 @@ export const useQueryMyProjectDetail = (id: string) => {
   return useSuspenseQuery({
     queryKey: ['my-project-detail', id],
     queryFn: async () => {
-      const project = await pb.collection(CollectionEnum.MY_PROJECT).getOne<MyProjectModel>(id);
+      const project = await pb.collection(CollectionEnum.VIEW_MY_PROJECT).getOne<MyProjectModel>(id);
 
       if (project.avatar) {
         project.avatar = pb.files.getUrl(project, project.avatar);
@@ -17,6 +17,8 @@ export const useQueryMyProjectDetail = (id: string) => {
       if (project.ownerAvatar) {
         project.ownerAvatar = pb.files.getUrl(project, project.ownerAvatar);
       }
+
+      project.isOwner = project.ownerId === pb.authStore.model?.id;
 
       return project;
     },

@@ -9,4 +9,5 @@ export interface MyProjectModel extends RecordModel {
   ownerId: string;
   ownerAvatar?: string;
   ownerName: string;
+  isOwner: boolean;
 }

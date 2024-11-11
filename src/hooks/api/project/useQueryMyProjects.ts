@@ -22,7 +22,7 @@ export const useQueryMyProjects = ({
         options.filter = `(name~'${search}')`;
       }
 
-      const myProjects = await pb.collection(CollectionEnum.MY_PROJECT).getList<MyProjectModel>(page, perPage, options);
+      const myProjects = await pb.collection(CollectionEnum.VIEW_MY_PROJECT).getList<MyProjectModel>(page, perPage, options);
 
       const items = myProjects.items.map((myProject) => {
         if (myProject.avatar) {
@@ -32,6 +32,8 @@ export const useQueryMyProjects = ({
         if (myProject.ownerAvatar) {
           myProject.ownerAvatar = pb.files.getUrl(myProject, myProject.ownerAvatar);
         }
+
+        myProject.isOwner = myProject.ownerId === pb.authStore.model?.id;
 
         return myProject;
       });

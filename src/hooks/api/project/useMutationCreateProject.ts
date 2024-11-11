@@ -13,16 +13,11 @@ export const useMutationCreateProject = () => {
         throw new Error('User not authenticated');
       }
 
-      const project = await pb.collection(CollectionEnum.PROJECT).create({
+      await pb.collection(CollectionEnum.PROJECT).create({
         name: data.name,
         description: data.description,
         avatar: data.avatar,
         ownerId,
-      });
-
-      await pb.collection(CollectionEnum.PROJECT_COLLABORATION).create({
-        userId: ownerId,
-        projectId: project.id,
       });
     },
     onSuccess: async () => {

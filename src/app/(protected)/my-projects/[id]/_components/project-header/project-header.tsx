@@ -1,17 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useQueryMyProjectDetail } from "@/hooks/api/project/useQueryMyProjectDetail";
-import { usePocketBase } from "@/lib/pocketbase";
-import { UpdateProjectDrawer } from "../_project-drawer/update-project-drawer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryMyProjectDetail } from "@/hooks/api/project/useQueryMyProjectDetail";
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { UpdateProjectDrawer } from "../../../_components/project-drawer/update-project-drawer";
 
 interface ProjectHeaderProps {
   id: string;
 }
 
 export const ProjectHeader = ({ id }: ProjectHeaderProps) => {
-  const pb = usePocketBase();
   const router = useRouter();
   const { data: project } = useQueryMyProjectDetail(id);
 
@@ -37,7 +35,7 @@ export const ProjectHeader = ({ id }: ProjectHeaderProps) => {
           {project?.description}
         </p>
       </div>
-      {project && project.ownerId === pb.authStore.model?.id && (
+      {project?.isOwner && (
         <UpdateProjectDrawer project={project}/>
       )}
     </div>
