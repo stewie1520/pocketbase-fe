@@ -5,11 +5,11 @@ import { useQueryMyProjects } from "@/hooks/api/project/useQueryMyProjects";
 import usePagination from "@/hooks/use-pagination";
 import { MyProjectModel } from "@/models/my-project";
 import { flexRender, getCoreRowModel, Row, useReactTable } from "@tanstack/react-table";
+import debounce from "lodash/debounce";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { columns } from "./columns";
-import debounce from "lodash/debounce";
 import { useCallback, useState } from "react";
+import { columns } from "./columns";
 
 export const MyProjectsList = () => {
   const router = useRouter();
@@ -59,7 +59,7 @@ export const MyProjectsList = () => {
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="hover:bg-neutral-200 cursor-pointer">
                       {header.isPlaceholder
                         ? null
                         : flexRender(

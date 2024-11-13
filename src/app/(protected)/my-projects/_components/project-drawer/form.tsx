@@ -4,6 +4,7 @@ import { ProjectFormValues } from "./validation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export interface ProjectFormRef {
   reset: () => void;
@@ -87,7 +88,7 @@ export const ProjectForm = forwardRef<ProjectFormRef, ProjectFormProps>((props, 
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Input placeholder="Description" {...field} />
+              <Textarea placeholder="Description" {...field} />
             </FormControl>
             <FormMessage/>
           </FormItem>
@@ -96,3 +97,5 @@ export const ProjectForm = forwardRef<ProjectFormRef, ProjectFormProps>((props, 
     </div>
   );
 });
+
+ProjectForm.displayName = "ProjectForm";

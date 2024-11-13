@@ -15,9 +15,10 @@ import {
   SidebarMenuItem
 } from "@/components/ui/sidebar";
 import { UserModel } from "@/models/user";
-import { ChevronsUpDown, Layers, LogOut, Settings } from "lucide-react";
+import { ChevronsUpDown, Inbox, Layers, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCountUnseenNotification } from "@/hooks/api/notification/useCountUnseenNotification";
 
 const platformLinks = [
   {
@@ -30,6 +31,8 @@ const platformLinks = [
 export function AppSidebar({ user, onSignOut }: { onSignOut: () => void; user: NonNullable<UserModel> }) {
   const path = usePathname();
 
+  const { data: unseenNotificationCount } = useCountUnseenNotification();
+
   return (
     <Sidebar>
       <SidebarHeader />
@@ -38,6 +41,18 @@ export function AppSidebar({ user, onSignOut }: { onSignOut: () => void; user: N
           <SidebarGroupLabel>Platforms</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/inbox" className={path.startsWith("/inbox") ? "bg-neutral-100" : ""}>
+                    <Inbox className="size-4" />
+                    <span>Inbox</span>
+                    {unseenNotificationCount > 0 && (
+                      <div className="size-4 text-[10px] leading-[10px] rounded-full flex items-center justify-center bg-blue-500 text-white">{unseenNotificationCount}</div>
+                    )}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
               {platformLinks.map((link) => (
                 <SidebarMenuItem key={link.href}>
                   <SidebarMenuButton asChild>

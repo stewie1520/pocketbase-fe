@@ -1,6 +1,6 @@
 import { CollectionEnum, usePocketBase } from "@/lib/pocketbase";
 import { ProjectMember } from "@/models/project-member";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useQueryProjectMembers = (projectId: string) => {
   const pb = usePocketBase();
@@ -25,4 +25,14 @@ export const useQueryProjectMembers = (projectId: string) => {
       });
     },
   });
+}
+
+export const useInvalidateProjectMembers = () => {
+  const queryClient = useQueryClient();
+
+  return (projectId: string) => {
+    queryClient.invalidateQueries({
+      queryKey: ["project-members", projectId],
+    });
+  }
 }

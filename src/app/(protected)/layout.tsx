@@ -1,10 +1,9 @@
 "use client";
 
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { usePocketBase } from "@/lib/pocketbase";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useQueryCurrentUser } from "@/hooks/api/user/useQueryCurrentUser";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { useSubscribeNotification } from "@/hooks/api/notification/useSubscribeNotification";
+import { useToast } from "@/hooks/use-toast";
+import { useMustLogin } from "../../hooks/use-must-login";
 import { AppSidebar } from "./_components/app-sidebar";
 import Loading from "./loading";
 
@@ -15,34 +14,27 @@ export default function ProtectedLayout(
     children: React.ReactNode;
   }>
 ) {
-  const router = useRouter();
-  const pb = usePocketBase();
-  const { data: user, isPending } = useQueryCurrentUser();
-  const [isMounted, setIsMounted] = useState(false);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  useSubscribeNotification({
+    onNewNotification: (notification) => {
+      toast({
+        title: "New Notification",
+        description: notification.message,
+      });
+    }
+  });
 
-  useEffect(() => {
-    pb.authStore.onChange(() => {
-      if (!pb.authStore.isValid) {
-        router.push('/login');
-        return;
-      }
-    }, true);
-  }, [pb.authStore, router]);
-
-  const handleSignOut = async () => {
-    pb?.authStore.clear();
-  };
-
-  if (!isMounted || isPending || !user) return <Loading />;
+  const { user, isCheckingAuth, handleSignOut } = useMustLogin();
+  if (isCheckingAuth) return <Loading />;
 
   return (
     <SidebarProvider>
-      <AppSidebar onSignOut={handleSignOut} user={user}/>
-      <main className="w-full">
+      <AppSidebar onSignOut={handleSignOut} user={user!}/>
+      <main className="w-full relative">
+        <div className="absolute top-0 left-0">
+          <SidebarTrigger />
+        </div>
         {children}
       </main>
     </SidebarProvider>

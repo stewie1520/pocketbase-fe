@@ -1,9 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryMyProjectDetail } from "@/hooks/api/project/useQueryMyProjectDetail";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { UpdateProjectDrawer } from "../../../_components/project-drawer/update-project-drawer";
+import { Button } from "../../../../../../components/ui/button";
+import Link from "next/link";
 
 interface ProjectHeaderProps {
   id: string;
@@ -36,7 +38,14 @@ export const ProjectHeader = ({ id }: ProjectHeaderProps) => {
         </p>
       </div>
       {project?.isOwner && (
-        <UpdateProjectDrawer project={project}/>
+        <div className="flex flex-row gap-1">
+          <UpdateProjectDrawer project={project}/>
+          <Link href={`/my-projects/${id}/settings`}>
+            <Button variant="ghost">
+              <Settings className="w-4 h-4" />
+            </Button>
+          </Link>
+        </div>
       )}
     </div>
   )
