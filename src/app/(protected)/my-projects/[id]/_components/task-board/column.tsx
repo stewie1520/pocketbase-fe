@@ -1,17 +1,20 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ITask, Status } from "@/models/task"
-import { LucideProps, Plus } from "lucide-react"
+import { Loader2, LucideProps, Plus } from "lucide-react"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { createContext, ForwardRefExoticComponent, RefAttributes, useContext, useEffect, useState } from "react"
 import { CreateTaskDrawer } from "../create-task-drawer"
 import { useBoardContext } from "./context"
 import { useDroppable } from "@dnd-kit/core"
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const ColumnContext = createContext<{
   setHeaderComp: (headerComp: React.ReactNode) => void;
   status: Status;
   items: ITask[];
+  hasMore?: boolean;
+  onLoadMore?: () => void;
 }>({
   setHeaderComp: () => {},
   items: [],
@@ -26,15 +29,19 @@ export const Column = ({
   children,
   status,
   items,
+  hasMore,
+  onLoadMore,
 }: {
   children: React.ReactNode,
   status: Status;
   items: ITask[];
+  hasMore?: boolean;
+  onLoadMore?: () => void;
 }) => {
   const [headerComp, setHeaderComp] = useState<React.ReactNode>(null)
   return (
     <SortableContext items={items.map(task => task.id)} strategy={verticalListSortingStrategy}>
-      <ColumnContext.Provider value={{ setHeaderComp, status, items, }}>
+      <ColumnContext.Provider value={{ setHeaderComp, status, items, hasMore, onLoadMore }}>
         <div className="relative flex flex-col gap-2 w-[320px] h-full flex-shrink-0">
           {headerComp}
           {children}
@@ -150,18 +157,25 @@ export const ColumnBody = ({
 }: {
   children?: React.ReactNode
 }) => {
-  const { status } = useColumnContext();
+  const { status, items, hasMore, onLoadMore } = useColumnContext();
   const { setNodeRef, isOver } = useDroppable({
     id: status,
   });
 
-  const className = cn("flex flex-col gap-2 flex-1 overflow-y-auto", {
-    "border border-dashed border-neutral-200": isOver,
+  const className = cn("flex flex-col gap-2 flex-1 max-h-[600px] overflow-y-auto", {
+    "border border-dashed border-neutral-200 bg-blue-100/30": isOver,
   })
 
   return (
-    <div ref={setNodeRef} className={className}>
-      {children}
-    </div>
+      <InfiniteScroll
+        dataLength={items.length}
+        next={onLoadMore ?? (() => {})}
+        hasMore={!!hasMore}
+        loader={<div className="w-full items-center flex"><Loader2 className="size-3 animate-spin" /></div>}
+      >
+        <div ref={setNodeRef} className={className}>
+          {children}
+        </div>
+      </InfiniteScroll>
   );
 }

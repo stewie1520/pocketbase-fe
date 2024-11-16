@@ -16,6 +16,7 @@ type ColumnData = {
   status: Status,
   tasks: ITask[],
   total: number,
+  hasMore?: boolean,
 }
 
 export const TaskBoard = ({ id }: { id: string }) => {
@@ -32,75 +33,85 @@ export const TaskBoard = ({ id }: { id: string }) => {
   const [todo, setTodo] = useState<ColumnData>({
     status: "todo",
     tasks: [],
+    hasMore: false,
     total: 0,
   });
 
   const [inProgress, setInProgress] = useState<ColumnData>({
     status: "in-progress",
     tasks: [],
+    hasMore: false,
     total: 0,
   });
 
   const [toReview, setToReview] = useState<ColumnData>({
     status: "to-review",
     tasks: [],
+    hasMore: false,
     total: 0,
   });
 
   const [toQA, setToQA] = useState<ColumnData>({
     status: "to-qa",
     tasks: [],
+    hasMore: false,
     total: 0,
   });
 
   const [done, setDone] = useState<ColumnData>({
     status: "done",
     tasks: [],
+    hasMore: false,
     total: 0,
   });
 
-  const { data: listTodoTasks } = useQueryListProjectTasks("todo", id)
+  const { data: listTodoTasks, hasNextPage: todoHasNextPage, fetchNextPage: fetchNextToDoTasks } = useQueryListProjectTasks("todo", id)
   useEffect(() => {
     setTodo(todo => ({
       ...todo,
       tasks: listTodoTasks?.pages.flatMap((page) => page.items) ?? [],
       total: listTodoTasks?.pages[0].totalItems ?? 0,
+      hasMore: todoHasNextPage,
     }))
   }, [listTodoTasks])
 
-  const { data: listInProgressTasks } = useQueryListProjectTasks("in-progress", id)
+  const { data: listInProgressTasks, hasNextPage: inProgressHasNextPage, fetchNextPage: fetchNextInProgressTasks } = useQueryListProjectTasks("in-progress", id)
   useEffect(() => {
     setInProgress(inProgress => ({
       ...inProgress,
       tasks: listInProgressTasks?.pages.flatMap((page) => page.items) ?? [],
       total: listInProgressTasks?.pages[0].totalItems ?? 0,
+      hasMore: inProgressHasNextPage,
     }))
   }, [listInProgressTasks])
 
-  const { data: listToReviewTasks } = useQueryListProjectTasks("to-review", id)
+  const { data: listToReviewTasks, hasNextPage: toReviewHasNextPage, fetchNextPage: fetchNextToReviewTasks } = useQueryListProjectTasks("to-review", id)
   useEffect(() => {
     setToReview((toReview) => ({
       ...toReview,
       tasks: listToReviewTasks?.pages.flatMap((page) => page.items) ?? [],
       total: listToReviewTasks?.pages[0].totalItems ?? 0,
+      hasMore: toReviewHasNextPage,
     }))
   }, [listToReviewTasks])
 
-  const { data: listToQATasks } = useQueryListProjectTasks("to-qa", id)
+  const { data: listToQATasks, hasNextPage: toQAHasNextPage, fetchNextPage: fetchNextToQATasks } = useQueryListProjectTasks("to-qa", id)
   useEffect(() => {
     setToQA((qa) => ({
       ...qa,
       tasks: listToQATasks?.pages.flatMap((page) => page.items) ?? [],
       total: listToQATasks?.pages[0].totalItems ?? 0,
+      hasMore: toQAHasNextPage,
     }))
   }, [listToQATasks])
 
-  const { data: listDoneTasks } = useQueryListProjectTasks("done", id)
+  const { data: listDoneTasks, hasNextPage: doneHasNextPage, fetchNextPage: fetchNextDoneTasks } = useQueryListProjectTasks("done", id)
   useEffect(() => {
     setDone(done => ({
       ...done,
       tasks: listDoneTasks?.pages.flatMap((page) => page.items) ?? [],
       total: listDoneTasks?.pages[0].totalItems ?? 0,
+      hasMore: doneHasNextPage,
     }))
   }, [listDoneTasks])
 
@@ -236,8 +247,8 @@ export const TaskBoard = ({ id }: { id: string }) => {
       const newOverColumnTasks = [...overColumn.tasks];
       newOverColumnTasks.splice(overIndex, 0, activeTask);
 
-      getColumnSetter(activeColumn)({ ...activeColumn, tasks: newActiveColumnTasks });
-      getColumnSetter(overColumn)({ ...overColumn, tasks: newOverColumnTasks });
+      getColumnSetter(activeColumn)({ ...activeColumn, total: activeColumn.total - 1,  tasks: newActiveColumnTasks });
+      getColumnSetter(overColumn)({ ...overColumn, total: overColumn.total + 1, tasks: newOverColumnTasks });
 
       const nextTask = newOverColumnTasks[overIndex + 2];
       const previousTask = newOverColumnTasks[overIndex];
@@ -255,12 +266,12 @@ export const TaskBoard = ({ id }: { id: string }) => {
 
   const onTaskCreated = (task: ITask) => {
     const column = getColumnByStatus(task.status);
-    getColumnSetter(column)({ ...column, tasks: [...column.tasks, task] });
+    getColumnSetter(column)({ ...column, tasks: [...column.tasks, task], total: column.total + 1 });
   }
 
   return (
     <ScrollContainer
-      className="w-full max-w-full h-full p-4 gap-4 border rounded-md bg-neutral-50 flex flex-row flex-nowrap"
+      className="size-full p-4 gap-4 border rounded-md bg-neutral-50 flex flex-row flex-nowrap"
       mouseScroll={{ ignoreElements: '[prevent-drag-scroll]' }}
     >
       <DndContext
@@ -273,7 +284,7 @@ export const TaskBoard = ({ id }: { id: string }) => {
           {activeTask ? <Task task={activeTask} /> : null}
         </DragOverlay>          
         <BoardContextProvider value={{ projectId: id, onTaskCreated }}>
-          <Column status="todo" items={todo.tasks}>
+          <Column status="todo" items={todo.tasks} hasMore={todo.hasMore} onLoadMore={fetchNextToDoTasks}>
             <ColumnHeader>
               <ColumnTitle title="To Do" />
               <ColumnBadge count={todo.total} Icon={EditIcon} backgroundClass="bg-red-100/30" textClass="text-red-600" />
@@ -285,7 +296,7 @@ export const TaskBoard = ({ id }: { id: string }) => {
             </ColumnBody>
           </Column>
 
-          <Column status="in-progress" items={inProgress.tasks}>
+          <Column status="in-progress" items={inProgress.tasks} hasMore={inProgress.hasMore} onLoadMore={fetchNextInProgressTasks}>
             <ColumnHeader>
               <ColumnTitle title="In Progress" />
               <ColumnBadge count={inProgress.total} Icon={Loader} backgroundClass="bg-blue-100/30" textClass="text-blue-600" />
@@ -298,7 +309,7 @@ export const TaskBoard = ({ id }: { id: string }) => {
           </Column>
 
 
-          <Column status="to-review" items={toReview.tasks}>
+          <Column status="to-review" items={toReview.tasks} hasMore={toReview.hasMore} onLoadMore={fetchNextToReviewTasks}>
             <ColumnHeader>
               <ColumnTitle title="To Review" />
               <ColumnBadge count={toReview.total} Icon={Code} backgroundClass="bg-yellow-100/30" textClass="text-yellow-600" />
@@ -310,7 +321,7 @@ export const TaskBoard = ({ id }: { id: string }) => {
             </ColumnBody>
           </Column>
 
-          <Column status="to-qa" items={toQA.tasks}>
+          <Column status="to-qa" items={toQA.tasks} hasMore={toQA.hasMore} onLoadMore={fetchNextToQATasks}>
             <ColumnHeader>
               <ColumnTitle title="To QA" />
               <ColumnBadge count={toQA.total} Icon={Glasses} backgroundClass="bg-orange-100/30" textClass="text-orange-600" />
@@ -322,7 +333,7 @@ export const TaskBoard = ({ id }: { id: string }) => {
             </ColumnBody>
           </Column>
 
-          <Column status="done" items={done.tasks}>
+          <Column status="done" items={done.tasks} hasMore={done.hasMore} onLoadMore={fetchNextDoneTasks}>
             <ColumnHeader>
               <ColumnTitle title="Done" />
               <ColumnBadge count={done.total} Icon={Check} backgroundClass="bg-green-100/30" textClass="text-green-600" />

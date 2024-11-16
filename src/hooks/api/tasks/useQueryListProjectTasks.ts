@@ -3,7 +3,7 @@ import { ITask, Status } from "@/models/task";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { ListResult } from "pocketbase";
 
-const DEFAULT_PER_PAGE = 20;
+const DEFAULT_PER_PAGE = 10;
 
 export const useQueryListProjectTasks = (status: Status, projectId?: string) => {
   const pb = usePocketBase()
