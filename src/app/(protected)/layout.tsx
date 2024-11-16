@@ -31,7 +31,7 @@ export default function ProtectedLayout(
   return (
     <SidebarProvider>
       <AppSidebar onSignOut={handleSignOut} user={user!}/>
-      <main className="w-full relative">
+      <main className="w-full relative overflow-x-hidden">
         <div className="absolute top-0 left-0">
           <SidebarTrigger />
         </div>

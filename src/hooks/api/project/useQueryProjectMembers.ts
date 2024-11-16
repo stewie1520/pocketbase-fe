@@ -21,7 +21,7 @@ export const useQueryProjectMembers = (projectId: string) => {
         return {
           ...member,
           role: member.userId === member.projectOwnerId ? 'owner' : 'member',
-        }
+        } as ProjectMember;
       });
     },
   });

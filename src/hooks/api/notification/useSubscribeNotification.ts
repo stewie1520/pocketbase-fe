@@ -1,8 +1,8 @@
 import { CollectionEnum, usePocketBase } from "@/lib/pocketbase";
 import { Notification } from "@/models/notification";
 import { useEffect } from "react";
-import { useInvalidateNotification } from "./useQueryNotification";
 import { useIncrementUnseenNotification } from "./useCountUnseenNotification";
+import { useInvalidateNotification } from "./useQueryNotification";
 
 export const useSubscribeNotification = ({
   onNewNotification

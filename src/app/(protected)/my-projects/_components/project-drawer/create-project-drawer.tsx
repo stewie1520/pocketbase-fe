@@ -6,7 +6,7 @@ import { useMutationCreateProject } from "@/hooks/api/project/useMutationCreateP
 import { useToast } from "@/hooks/use-toast"
 import { yupResolver } from "@hookform/resolvers/yup"
 import { Plus } from "lucide-react"
-import { PropsWithChildren, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { ProjectForm, ProjectFormRef } from "./form"
 import { projectFormSchema, ProjectFormValues } from "./validation"
