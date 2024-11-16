@@ -1,8 +1,7 @@
-import { CollectionEnum, usePocketBase } from "@/lib/pocketbase"
-import { ITask, Status } from "@/models/task"
-import { InfiniteData, useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
-import { produce } from "immer"
-import { ListResult } from "pocketbase"
+import { CollectionEnum, usePocketBase } from "@/lib/pocketbase";
+import { ITask, Status } from "@/models/task";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { ListResult } from "pocketbase";
 
 const DEFAULT_PER_PAGE = 20;
 
@@ -56,55 +55,3 @@ export const useQueryListProjectTasks = (status: Status, projectId?: string) => 
   })
 }
 
-export const useOptimisticAddTask = () => {
-  const queryClient = useQueryClient();
-
-
-  return (task: ITask) => {
-    const queryKey = ["projects", task.projectId, "tasks", task.status]
-
-    queryClient.setQueryData(queryKey, (data: InfiniteData<ListResult<ITask>>) => {
-      const firstPage = data?.pages?.[0];
-      if (!firstPage) {
-        return produce(data, draft => {
-          draft.pages.push({
-            page: 1,
-            perPage: DEFAULT_PER_PAGE,
-            totalItems: 1,
-            totalPages: 1,
-            items: [
-              task,
-            ]
-          })
-        });
-      }
-
-      const lastPage = data.pages[data.pages.length - 1];
-      if (lastPage.items.length < lastPage.perPage) {
-        return produce(data, draft => {
-          draft.pages[draft.pages.length - 1].items.push(task);
-          draft.pages.forEach((page) => {
-            page.totalItems += 1;
-          });
-        });
-      }
-
-      return produce(data, draft => {
-        draft.pages.forEach((page) => {
-          page.totalItems += 1;
-          page.totalPages += 1;
-        });
-
-        draft.pages.push({
-          page: data.pages.length + 1,
-          perPage: data.pages[0].perPage,
-          totalItems: data.pages[0].totalItems + 1,
-          totalPages: data.pages[0].totalPages + 1,
-          items: [
-            task,
-          ]
-        })
-      });
-    }) 
-  }
-}

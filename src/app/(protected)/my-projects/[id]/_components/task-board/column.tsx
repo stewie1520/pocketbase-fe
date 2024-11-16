@@ -2,11 +2,13 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ITask, Status } from "@/models/task"
 import { LucideProps, Plus } from "lucide-react"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { createContext, ForwardRefExoticComponent, RefAttributes, useContext, useEffect, useState } from "react"
 import { CreateTaskDrawer } from "../create-task-drawer"
 import { useBoardContext } from "./context"
+import { useDroppable } from "@dnd-kit/core"
 
-const ColumnHeaderContext = createContext<{
+const ColumnContext = createContext<{
   setHeaderComp: (headerComp: React.ReactNode) => void;
   status: Status;
   items: ITask[];
@@ -16,8 +18,8 @@ const ColumnHeaderContext = createContext<{
   status: "todo",
 })
 
-const useColumnHeaderContext = () => {
-  return useContext(ColumnHeaderContext)
+const useColumnContext = () => {
+  return useContext(ColumnContext)
 }
 
 export const Column = ({
@@ -31,12 +33,14 @@ export const Column = ({
 }) => {
   const [headerComp, setHeaderComp] = useState<React.ReactNode>(null)
   return (
-    <ColumnHeaderContext.Provider value={{ setHeaderComp, status, items, }}>
-      <div className="relative flex flex-col gap-2 w-[320px] h-full flex-shrink-0">
-        {headerComp}
-        {children}
-      </div>
-    </ColumnHeaderContext.Provider>
+    <SortableContext items={items.map(task => task.id)} strategy={verticalListSortingStrategy}>
+      <ColumnContext.Provider value={{ setHeaderComp, status, items, }}>
+        <div className="relative flex flex-col gap-2 w-[320px] h-full flex-shrink-0">
+          {headerComp}
+          {children}
+        </div>
+      </ColumnContext.Provider>
+    </SortableContext>
   )
 }
 
@@ -65,7 +69,7 @@ export const ColumnHeader = ({
 }: {
   children: React.ReactNode,
 }) => {
-  const { setHeaderComp, status } = useColumnHeaderContext()
+  const { setHeaderComp, status } = useColumnContext()
   const { projectId, onTaskCreated } = useBoardContext()
   const [titleComp, setTitleComp] = useState<React.ReactNode>(null)
   const [badgeComp, setBadgeComp] = useState<React.ReactNode>(null)
@@ -85,7 +89,7 @@ export const ColumnHeader = ({
                 {titleComp}
                 {children}
               </div>
-                {badgeComp}
+              {badgeComp}
             </div>
           </div>
         </ColumnBadgeContext.Provider>
@@ -146,8 +150,17 @@ export const ColumnBody = ({
 }: {
   children?: React.ReactNode
 }) => {
+  const { status } = useColumnContext();
+  const { setNodeRef, isOver } = useDroppable({
+    id: status,
+  });
+
+  const className = cn("flex flex-col gap-2 flex-1 overflow-y-auto", {
+    "border border-dashed border-neutral-200": isOver,
+  })
+
   return (
-    <div className="flex flex-col gap-2 flex-1 overflow-y-auto">
+    <div ref={setNodeRef} className={className}>
       {children}
     </div>
   );
