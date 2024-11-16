@@ -16,4 +16,5 @@ export interface ITask {
   assignees: ITaskUser[];
 }
 
-export type Status = "todo" | "in-progress" | "to-review" | "to-qa" | "done";
+export const StatusValues = ["todo", "in-progress", "to-review", "to-qa", "done"] as const;
+export type Status = typeof StatusValues[number];

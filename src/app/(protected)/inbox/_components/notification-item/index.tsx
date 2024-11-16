@@ -1,11 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useMarkNotificationAsSeen } from "@/hooks/api/notification/useMarkNotificationAsSeen";
 import { cn } from "@/lib/utils";
 import { ViewNotification } from "@/models/notification";
 import { formatDistanceToNow } from "date-fns";
+import { BriefcaseBusiness, MailPlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
-import { MailPlusIcon } from "lucide-react";
 
 export const NotificationItem = ({
   notification
@@ -25,6 +25,11 @@ export const NotificationItem = ({
 
     if (notification.type === "INVITE_TO_PROJECT") {
       router.push(`/my-projects/${notification.projectCollaborationId}`)
+      return;
+    }
+
+    if (notification.type === "ASSIGNED_TO_TASK") {
+      router.push(`/my-projects/${notification.projectCollaborationId}/tasks/${notification.taskId}`)
     }
   }
 
@@ -46,6 +51,11 @@ export const NotificationItem = ({
                           <MailPlusIcon className="text-white size-2.5"/>
                         </div>
                       )}
+                      {notification.type === "ASSIGNED_TO_TASK" && (
+                        <div className="rounded-full size-4 flex items-center justify-center bg-red-600">
+                          <BriefcaseBusiness className="text-white size-2.5"/>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -55,9 +65,11 @@ export const NotificationItem = ({
                               <div className="text-sm font-medium text-zinc-700 flex flex-row items-center gap-1">
                                 {!notification.seen && (
                                   <div className="size-2 bg-blue-500 rounded-full"></div>
-                                )} {notification.projectName}
+                                )}
+                                {notification.type === "INVITE_TO_PROJECT" && notification.projectName}
+                                {notification.type === "ASSIGNED_TO_TASK" && notification.taskTitle}
                               </div>
-                              <p className="text-[13px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                              <p className="text-[13px] text-zinc-500 mt-0.5">
                                 {notification.message}
                               </p>
                           </div>
@@ -66,9 +78,9 @@ export const NotificationItem = ({
               </div>
 
               <div className="mt-2 ml-14">
-                  <p className="text-[12px] text-zinc-400 dark:text-zinc-500">
-                      {formatDistanceToNow(new Date(notification.created), { addSuffix: true })}
-                  </p>
+                <p className="text-[12px] text-zinc-400 dark:text-zinc-500">
+                  {formatDistanceToNow(new Date(notification.created), { addSuffix: true })}
+                </p>
               </div>
           </div>
       </div>

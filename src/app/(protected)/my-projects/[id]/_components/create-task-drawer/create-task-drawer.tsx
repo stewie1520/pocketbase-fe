@@ -1,3 +1,4 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -5,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import { MultiSelect } from "@/components/ui/multi-select"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { Textarea } from "@/components/ui/textarea"
 import { useQueryProjectMembers } from "@/hooks/api/project/useQueryProjectMembers"
 import { useCreateTask } from "@/hooks/api/tasks/useCreateTask"
 import { useToast } from "@/hooks/use-toast"
@@ -13,8 +13,8 @@ import { ITask, Status } from "@/models/task"
 import { yupResolver } from "@hookform/resolvers/yup"
 import { useMemo } from "react"
 import { useForm } from "react-hook-form"
+import { Editor } from "./edtior"
 import { createTaskFormValidation, CreateTaskFormValue } from "./validation"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface CreateTaskDrawerProps {
   open: boolean;
@@ -111,68 +111,57 @@ export const CreateTaskDrawer = ({ open, onOpenChange, onTaskCreated, projectId,
                 )}
               />
 
-              <FormField
-                control={methods.control}
-                name="assigneeIds"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assignees</FormLabel>
-                    <FormControl>
-                      <MultiSelect
-                        options={memberOptions}
-                        onValueChange={field.onChange}
-                        placeholder="Select assignees"
-                        maxCount={3}
-                      />
-                    </FormControl>
-                    <FormMessage/>
-                  </FormItem>
-                )}
-              />
+              <div className="flex flex-row gap-4 items-center">
+                <FormField
+                  control={methods.control}
+                  name="assigneeIds"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Assignees</FormLabel>
+                      <FormControl>
+                        <MultiSelect
+                          options={memberOptions}
+                          onValueChange={field.onChange}
+                          placeholder="Select assignees"
+                          maxCount={1}
+                        />
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={methods.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Theme" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todo">To Do</SelectItem>
-                        <SelectItem value="in-progress">In Progress</SelectItem>
-                        <SelectItem value="to-review">To Review</SelectItem>
-                        <SelectItem value="to-qa">To QA</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    </FormControl>
-                    <FormMessage/>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={methods.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Description" {...field} />
-                    </FormControl>
-                    <FormMessage/>
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={methods.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Theme" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="todo">To Do</SelectItem>
+                          <SelectItem value="in-progress">In Progress</SelectItem>
+                          <SelectItem value="to-review">To Review</SelectItem>
+                          <SelectItem value="to-qa">To QA</SelectItem>
+                          <SelectItem value="done">Done</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <Editor projectId={projectId} />
             </div>
-            <DrawerFooter >
-              <Button disabled={!isValid}>Create</Button>            
+            <DrawerFooter className="flex flex-row" >
+              <Button className="flex-1" disabled={!isValid}>Create</Button>            
               <DrawerClose asChild>
-                <Button onClick={handleCancel} variant="outline">Cancel</Button>
+                <Button className="flex-1" onClick={handleCancel} variant="outline">Cancel</Button>
               </DrawerClose>
             </DrawerFooter>
           </form>
