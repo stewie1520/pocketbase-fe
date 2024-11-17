@@ -1,8 +1,11 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { useQueryMyProjectDetail } from "@/hooks/api/project/useQueryMyProjectDetail";
+import { Plus } from "lucide-react";
 import { use } from "react";
 import { TaskBoard } from "./_components/task-board";
-import { useQueryMyProjectDetail } from "@/hooks/api/project/useQueryMyProjectDetail";
+import { TaskFilter } from "./_components/task-filter";
 
 export default function ProjectDetailPage({
   params,
@@ -15,7 +18,13 @@ export default function ProjectDetailPage({
   return (
     <div className="flex flex-col w-full h-full">
       <div className="max-w-full w-full h-full flex-1">
-        <TaskBoard id={project?.projectId} />
+        <div className="flex flex-col gap-2 h-full">
+          <div className="flex flex-row items-center gap-2">
+            <TaskFilter id={project?.projectId} />
+            <Button><Plus/> New issue</Button>
+          </div>
+          <TaskBoard id={project?.projectId} />
+        </div>
       </div>
     </div>
   )
