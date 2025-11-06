@@ -15,7 +15,9 @@ COPY pnpm-lock.yaml package.json ./
 
 RUN pnpm install --frozen-lockfile
 
-ENV NEXT_PUBLIC_POCKETBASE_URL=http://127.0.0.1:8090
+ARG NEXT_PUBLIC_POCKETBASE_URL
+
+ENV NEXT_PUBLIC_POCKETBASE_URL=$NEXT_PUBLIC_POCKETBASE_URL
 
 # Now copy the rest of the app and build it
 COPY . .
