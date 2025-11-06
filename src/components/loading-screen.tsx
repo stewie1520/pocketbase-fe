@@ -1,9 +1,9 @@
-import { Loader } from "lucide-react"
+import { Spinner } from "@nextui-org/react"
 
 export const LoadingScreen = () => {
   return (
     <div className="w-full h-screen flex items-center justify-center">
-      <Loader size="2rem" className="text-primary animate-spin" />
+      <Spinner size="lg" />
     </div>
   )
 }

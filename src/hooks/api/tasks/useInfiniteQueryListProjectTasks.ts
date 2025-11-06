@@ -1,15 +1,15 @@
 import { CollectionEnum, usePocketBase } from "@/lib/pocketbase";
-import { ITask, Status } from "@/models/task";
+import { ITask } from "@/models/task";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { ListResult } from "pocketbase";
 
 const DEFAULT_PER_PAGE = 10;
 
-export const useQueryListProjectTasks = (status: Status, projectId?: string) => {
+export const useInfiniteQueryListProjectTasks = (projectId?: string, filter?: Record<string, Record<string, string | string[]> | string>) => {
   const pb = usePocketBase()
 
   return useInfiniteQuery({
-    queryKey: ["projects", projectId, "tasks", status],
+    queryKey: ["projects", projectId, "tasks"],
     initialPageParam: 1,
     queryFn: async ({ pageParam = 1 }) => {
       const list = await pb.send<ListResult<ITask>>(`/projects/${projectId}/tasks`, {
@@ -17,9 +17,9 @@ export const useQueryListProjectTasks = (status: Status, projectId?: string) => 
         query: {
           page: pageParam,
           perPage: DEFAULT_PER_PAGE,
-          status,
+          ...filter,
         },
-        requestKey: ["projects", projectId, "tasks", status].join(":"),
+        requestKey: ["projects", projectId, "tasks"].join(":"),
       });
 
       list.items = list.items.map((task) => ({

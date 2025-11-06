@@ -1,4 +1,4 @@
-import { useQueryListProjectTasks } from "@/hooks/api/tasks/useQueryListProjectTasks";
+import { useInfiniteQueryListProjectTasks } from "@/hooks/api/tasks/useInfiniteQueryListProjectTasks";
 import { isStatus, ITask, Status } from "@/models/task";
 import { Check, Code, EditIcon, Glasses, Loader } from "lucide-react";
 
@@ -19,7 +19,12 @@ type ColumnData = {
   hasMore?: boolean,
 }
 
-export const TaskBoard = ({ id }: { id: string }) => {
+interface TaskBoardProps {
+  id: string;
+  filter?: Record<string, Record<string, string | string[]> | string>;
+}
+
+export const TaskBoard = ({ id, filter = {} }: TaskBoardProps) => {
   const { mutateAsync: updateTaskStatusAndOrder } = useUpdateTaskStatusAndOrder();
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -65,7 +70,7 @@ export const TaskBoard = ({ id }: { id: string }) => {
     total: 0,
   });
 
-  const { data: listTodoTasks, hasNextPage: todoHasNextPage, fetchNextPage: fetchNextToDoTasks } = useQueryListProjectTasks("todo", id)
+  const { data: listTodoTasks, hasNextPage: todoHasNextPage, fetchNextPage: fetchNextToDoTasks } = useInfiniteQueryListProjectTasks(id, Object.assign(filter, { status: "todo" }))
   useEffect(() => {
     setTodo(todo => ({
       ...todo,
@@ -75,7 +80,7 @@ export const TaskBoard = ({ id }: { id: string }) => {
     }))
   }, [listTodoTasks])
 
-  const { data: listInProgressTasks, hasNextPage: inProgressHasNextPage, fetchNextPage: fetchNextInProgressTasks } = useQueryListProjectTasks("in-progress", id)
+  const { data: listInProgressTasks, hasNextPage: inProgressHasNextPage, fetchNextPage: fetchNextInProgressTasks } = useInfiniteQueryListProjectTasks(id, Object.assign(filter, { status: "in-progress" }))
   useEffect(() => {
     setInProgress(inProgress => ({
       ...inProgress,
@@ -85,7 +90,7 @@ export const TaskBoard = ({ id }: { id: string }) => {
     }))
   }, [listInProgressTasks])
 
-  const { data: listToReviewTasks, hasNextPage: toReviewHasNextPage, fetchNextPage: fetchNextToReviewTasks } = useQueryListProjectTasks("to-review", id)
+  const { data: listToReviewTasks, hasNextPage: toReviewHasNextPage, fetchNextPage: fetchNextToReviewTasks } = useInfiniteQueryListProjectTasks(id, Object.assign(filter, { status: "to-review" }))
   useEffect(() => {
     setToReview((toReview) => ({
       ...toReview,
@@ -95,7 +100,7 @@ export const TaskBoard = ({ id }: { id: string }) => {
     }))
   }, [listToReviewTasks])
 
-  const { data: listToQATasks, hasNextPage: toQAHasNextPage, fetchNextPage: fetchNextToQATasks } = useQueryListProjectTasks("to-qa", id)
+  const { data: listToQATasks, hasNextPage: toQAHasNextPage, fetchNextPage: fetchNextToQATasks } = useInfiniteQueryListProjectTasks(id, Object.assign(filter, { status: "to-qa" }))
   useEffect(() => {
     setToQA((qa) => ({
       ...qa,
@@ -105,7 +110,7 @@ export const TaskBoard = ({ id }: { id: string }) => {
     }))
   }, [listToQATasks])
 
-  const { data: listDoneTasks, hasNextPage: doneHasNextPage, fetchNextPage: fetchNextDoneTasks } = useQueryListProjectTasks("done", id)
+  const { data: listDoneTasks, hasNextPage: doneHasNextPage, fetchNextPage: fetchNextDoneTasks } = useInfiniteQueryListProjectTasks(id, Object.assign(filter, { status: "done" }))
   useEffect(() => {
     setDone(done => ({
       ...done,

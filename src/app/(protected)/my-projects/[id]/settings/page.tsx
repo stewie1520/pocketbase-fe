@@ -1,17 +1,13 @@
 "use client";
 
-import { use } from "react";
-import { ProjectMembers } from "./_components/project-members/project-members";
 import { useQueryMyProjectDetail } from "@/hooks/api/project/useQueryMyProjectDetail";
+import { useParams } from "next/navigation";
+import { ProjectMembers } from "./_components/project-members/project-members";
 
 
-export default function ProjectSettingsPage({
-  params,
-}: Readonly<{
-  params: Promise<{ id: string }>;
-}>) {
-  const { id } = use(params)
-  const { data: myProject } = useQueryMyProjectDetail(id);
+export default function ProjectSettingsPage() {
+  const { id } = useParams();
+  const { data: myProject } = useQueryMyProjectDetail(id as string);
 
   return (
     <div className="flex flex-col w-full">

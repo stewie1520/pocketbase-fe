@@ -1,5 +1,11 @@
 import { Inbox } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "My Inbox",
+  description: "My Inbox",
+};
 
 export default function InboxPage({
   children

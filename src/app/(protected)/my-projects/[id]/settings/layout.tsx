@@ -1,15 +1,16 @@
-import { use, useMemo } from "react";
-import { SidebarNav } from "./_components/sidebar-nav/sidebar-nav";
+"use client";
+
 import { LockIcon, Users } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useMemo } from "react";
+import { SidebarNav } from "./_components/sidebar-nav/sidebar-nav";
 
 export default function ProjectSettingLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params)
+  const { id } = useParams();
   const sidebarNavItems = useMemo(() => {
     return [
       {

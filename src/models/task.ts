@@ -20,3 +20,17 @@ export interface ITask {
 export const StatusValues = ["todo", "in-progress", "to-review", "to-qa", "done"] as const;
 export type Status = typeof StatusValues[number];
 export const isStatus = (value: unknown): value is Status => StatusValues.includes(value as Status);
+export const statusToColor = (status: Status) => {
+  switch (status) {
+    case "todo":
+      return "primary";
+    case "in-progress":
+      return "secondary";
+    case "to-review":
+      return "warning";
+    case "to-qa":
+      return "success";
+    case "done":
+      return "success";
+  }
+}

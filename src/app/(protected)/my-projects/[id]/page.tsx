@@ -1,29 +1,25 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useQueryMyProjectDetail } from "@/hooks/api/project/useQueryMyProjectDetail";
-import { Plus } from "lucide-react";
-import { use } from "react";
-import { TaskBoard } from "./_components/task-board";
-import { TaskFilter } from "./_components/task-filter";
+import { useParams } from "next/navigation";
+import { TaskList } from "./_components/task-list";
 
-export default function ProjectDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
-  const { data: project } = useQueryMyProjectDetail(id);
+export default function ProjectDetailPage() {
+  const { id } = useParams();
+  const { data: project } = useQueryMyProjectDetail(id as string);
+
+  // const [filter, setFilter] = useState<Record<string, Record<string, string | string[]> | string>>({});
 
   return (
     <div className="flex flex-col w-full h-full">
       <div className="max-w-full w-full h-full flex-1">
         <div className="flex flex-col gap-2 h-full">
-          <div className="flex flex-row items-center gap-2">
-            <TaskFilter id={project?.projectId} />
+          {/* <div className="flex flex-row items-center gap-2">
+            <TaskFilter id={project?.projectId} onFilterChange={setFilter} />
             <Button><Plus/> New issue</Button>
           </div>
-          <TaskBoard id={project?.projectId} />
+          <TaskBoard id={project?.projectId} filter={filter} /> */}
+          <TaskList id={project?.projectId} />
         </div>
       </div>
     </div>
